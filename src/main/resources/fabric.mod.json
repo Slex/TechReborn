@@ -12,6 +12,7 @@
     "issues": "https://github.com/TechReborn/TechReborn/issues"
   },
   "environment": "*",
+  "mixins": ["techreborn.mixins.json"],
   "entrypoints": {
     "main": [
       "techreborn.TechReborn"

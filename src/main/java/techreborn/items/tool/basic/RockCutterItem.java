@@ -25,13 +25,12 @@
 package techreborn.items.tool.basic;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -47,6 +46,23 @@ public class RockCutterItem extends Item implements RcEnergyItem {
 	public RockCutterItem(String name) {
 		// combat stats same as for diamond pickaxe. Fix for #2468
 		super(TRItemSettings.unbreakable(name).pickaxe(TRToolMaterials.ROCK_CUTTER,  1f, -2.8f));
+	}
+
+	/**
+	 * Supplies intrinsic Silk Touch to block breaking without enchanting the actual item.
+	 */
+	public static ItemStack getDropTool(ItemStack tool, Level level) {
+		if (!(tool.getItem() instanceof RockCutterItem)) {
+			return tool;
+		}
+		var silkTouch = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH);
+		if (EnchantmentHelper.getItemEnchantmentLevel(silkTouch, tool) > 0) {
+			return tool;
+		}
+		// Only the drop/experience calculation sees this copy. The held tool stays enchantable.
+		ItemStack dropTool = tool.copy();
+		dropTool.enchant(silkTouch, 1);
+		return dropTool;
 	}
 
 	// PickaxeItem
@@ -69,17 +85,6 @@ public class RockCutterItem extends Item implements RcEnergyItem {
 	public boolean mineBlock(ItemStack stack, Level worldIn, BlockState blockIn, BlockPos pos, LivingEntity entityLiving) {
 		tryUseEnergy(stack, TechRebornConfig.rockCutterCost.get());
 		return true;
-	}
-
-	// Item
-	@Override
-	public void onCraftedPostProcess(ItemStack stack, Level world) {
-		if (!stack.isEnchanted()) {
-			HolderLookup.RegistryLookup<Enchantment> registry = world.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
-			stack.enchant(registry.getOrThrow(Enchantments.SILK_TOUCH), 1);
-		}
-
-		super.onCraftedPostProcess(stack, world);
 	}
 
 	@Override

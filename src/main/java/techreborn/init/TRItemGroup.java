@@ -27,7 +27,6 @@ package techreborn.init;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTabOutput;
 import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -39,8 +38,6 @@ import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
 import reborncore.common.powerSystem.RcEnergyItem;
 import techreborn.TechReborn;
@@ -48,7 +45,6 @@ import techreborn.component.TRDataComponentTypes;
 import techreborn.init.TRContent.Cells;
 import techreborn.items.armor.NanoSuitItem;
 import techreborn.items.armor.QuantumSuitItem;
-import techreborn.items.tool.basic.RockCutterItem;
 import techreborn.items.tool.industrial.NanosaberItem;
 import techreborn.utils.MaterialComparator;
 import techreborn.utils.MaterialTypeComparator;
@@ -241,7 +237,7 @@ public class TRItemGroup {
 		addPoweredItem(TRContent.INDUSTRIAL_JACKHAMMER, entries, null, true);
 		addPoweredItem(TRContent.INDUSTRIAL_DRILL, entries, null, true);
 
-		addRockCutter(entries, null, true);
+		addPoweredItem(TRContent.ROCK_CUTTER, entries, null, true);
 		addPoweredItem(TRContent.OMNI_TOOL, entries, null, true);
 
 		addPoweredItem(TRContent.QUANTUM_HELMET, entries, null, true);
@@ -818,32 +814,6 @@ public class TRItemGroup {
 			quantumSuitItem.applyModifier(uncharged, false, false);
 			quantumSuitItem.applyModifier(charged, false, false);
 		}
-
-		if (before == null) {
-			if (includeUncharged) {
-				entries.accept(uncharged);
-			}
-			entries.accept(charged);
-		}
-		else {
-			if (includeUncharged) {
-				entries.insertBefore(before, uncharged, charged);
-			}
-			else {
-				entries.insertBefore(before, charged);
-			}
-		}
-	}
-
-	private static void addRockCutter(FabricCreativeModeTabOutput entries, ItemLike before, boolean includeUncharged) {
-		HolderLookup.RegistryLookup<Enchantment> enchantmentRegistry = entries.getContext().holders().lookupOrThrow(Registries.ENCHANTMENT);
-		RockCutterItem rockCutter = (RockCutterItem) TRContent.ROCK_CUTTER;
-
-		ItemStack uncharged = new ItemStack(rockCutter);
-		uncharged.enchant(enchantmentRegistry.getOrThrow(Enchantments.SILK_TOUCH), 1);
-		ItemStack charged = new ItemStack(rockCutter);
-		charged.enchant(enchantmentRegistry.getOrThrow(Enchantments.SILK_TOUCH), 1);
-		rockCutter.setStoredEnergy(charged, rockCutter.getEnergyCapacity(charged));
 
 		if (before == null) {
 			if (includeUncharged) {
